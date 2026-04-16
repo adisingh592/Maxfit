@@ -614,7 +614,8 @@ def members():
         base_query = """
             SELECT u.user_id as id, u.reg_no, u.first_name, u.last_name, u.email, u.membership_status, 
                    u.join_date, u.expiry_date, u.price, u.trainer_id,
-                   t.first_name as trainer_name 
+                   t.first_name as trainer_name, t.last_name as trainer_last_name,
+                   u.age, u.height, u.weight, u.bmi, u.address, u.dob, u.goal, u.source
             FROM Users u 
             LEFT JOIN Users t ON u.trainer_id = t.user_id 
             WHERE u.role = 'member'
@@ -914,11 +915,13 @@ def member_details(user_id):
     if conn:
         cursor = conn.cursor(dictionary=True)
         query = """
-            SELECT u.user_id, u.reg_no, u.first_name, u.last_name, u.membership_status, u.join_date, u.expiry_date,
-                   t.first_name as trainer_first, t.last_name as trainer_last
+            SELECT u.user_id, u.reg_no, u.first_name, u.last_name, u.email, u.membership_status, 
+                   u.join_date, u.expiry_date, u.price, u.trainer_id,
+                   t.first_name as trainer_first, t.last_name as trainer_last,
+                   u.age, u.height, u.weight, u.bmi, u.address, u.dob, u.goal, u.source
             FROM Users u
             LEFT JOIN Users t ON u.trainer_id = t.user_id
-            WHERE u.user_id = %s
+            WHERE u.user_id = %s AND u.role = 'member'
         """
         cursor.execute(query, (user_id,))
         details = cursor.fetchone()
@@ -926,8 +929,17 @@ def member_details(user_id):
         conn.close()
         
         if details:
+            if request.is_json or request.headers.get('Accept') == 'application/json':
+                # Calculate remaining days
+                from datetime import date
+                if details.get('expiry_date'):
+                    remaining = (details['expiry_date'] - date.today()).days
+                    details['remaining_days'] = max(0, remaining)
+                else:
+                    details['remaining_days'] = 'N/A'
+                return jsonify(details)
             return render_template('member_details.html', member=details)
-    return "Member details failed to load natively structurally securely."
+    return "Member details failed to load", 404
 
 # --- ATTENDANCE SYSTEM API ---
 
