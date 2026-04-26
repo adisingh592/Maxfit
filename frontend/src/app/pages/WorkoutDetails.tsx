@@ -15,7 +15,7 @@ const WORKOUT_DATA: Record<string, any> = {
         id: 'e1',
         name: 'Barbell Bench Press',
         sets: '4 sets of 8-10 reps',
-        videoUrl: 'https://www.youtube.com/embed/rT7DgCr-3pg',
+        videoUrl: 'https://www.youtube.com/embed/hWbUlkb5Ms4',
         steps: [
           'Lie flat on the bench with your feet firmly planted on the ground.',
           'Grip the barbell slightly wider than shoulder-width apart.',
@@ -28,7 +28,7 @@ const WORKOUT_DATA: Record<string, any> = {
         id: 'e2',
         name: 'Overhead Shoulder Press',
         sets: '3 sets of 10-12 reps',
-        videoUrl: 'https://www.youtube.com/embed/2yjwXTZNiRo',
+        videoUrl: 'https://www.youtube.com/embed/zoN5EH50Dro',
         steps: [
           'Stand with feet shoulder-width apart, holding the barbell or dumbbells at shoulder level.',
           'Brace your core and press the weight straight up overhead.',
@@ -41,7 +41,7 @@ const WORKOUT_DATA: Record<string, any> = {
         id: 'e3',
         name: 'Pull-Ups',
         sets: '3 sets to failure',
-        videoUrl: 'https://www.youtube.com/embed/eGo4IYR2p5s',
+        videoUrl: 'https://www.youtube.com/embed/RhNyvtK-IaA',
         steps: [
           'Grab the pull-up bar with an overhand grip slightly wider than shoulder-width.',
           'Hang freely with your arms fully extended.',
@@ -62,7 +62,7 @@ const WORKOUT_DATA: Record<string, any> = {
         id: 'c1',
         name: 'Jump Rope',
         sets: '5 rounds of 3 mins',
-        videoUrl: 'https://www.youtube.com/embed/u3zgHI8QnqE',
+        videoUrl: 'https://www.youtube.com/embed/VLC6YO9w5iU',
         steps: [
           'Hold the handles firmly and keep your elbows tucked in close to your ribs.',
           'Use your wrists to swing the rope, not your whole arms.',
@@ -83,7 +83,7 @@ const WORKOUT_DATA: Record<string, any> = {
         id: 'a1',
         name: 'Plank',
         sets: '3 sets of 60 seconds',
-        videoUrl: 'https://www.youtube.com/embed/pSHjTRCQxIw',
+        videoUrl: 'https://www.youtube.com/embed/v25dawSzRTM',
         steps: [
           'Start in a push-up position but rest your weight on your forearms.',
           'Keep your body in a straight line from your head to your heels.',
@@ -104,7 +104,7 @@ const WORKOUT_DATA: Record<string, any> = {
         id: 'h1',
         name: 'Burpees',
         sets: '4 sets of 15 reps',
-        videoUrl: 'https://www.youtube.com/embed/dZgVxmf6jkA',
+        videoUrl: 'https://www.youtube.com/embed/NCqbpkoiyXE',
         steps: [
           'Start from a standing position.',
           'Drop into a squat position and place your hands on the ground.',
