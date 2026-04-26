@@ -815,6 +815,105 @@ def update_meal(user_id):
     conn.close()
     return render_template('update_meal.html', plan=plan, member=member, member_id=user_id)
 
+@app.route('/api/trainer/members', methods=['GET'])
+def api_trainer_members():
+    if session.get('role') != 'trainer':
+        return jsonify({"error": "Access Denied"}), 403
+        
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor(dictionary=True)
+        query = """
+            SELECT u.user_id as id, u.reg_no, u.first_name, u.last_name, u.email, u.goal, u.membership_status,
+                   wp.workout_details, wp.suggestion, mp.meal_details
+            FROM Users u 
+            LEFT JOIN WorkoutPlan wp ON u.user_id = wp.user_id
+            LEFT JOIN MealPlan mp ON u.user_id = mp.user_id
+            WHERE u.trainer_id = %s AND u.role = 'member'
+        """
+        cursor.execute(query, (session['user_id'],))
+        assigned_members = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        # Calculate progress mock or fetch from DB if progress exists
+        for m in assigned_members:
+            m['progress'] = 0 # Can be calculated from Progress table if needed
+            m['name'] = f"{m.get('first_name','')} {m.get('last_name','')}".strip()
+            m['regNo'] = m.get('reg_no')
+            
+        return jsonify({"members": assigned_members})
+    return jsonify({"error": "DB connection failed"}), 500
+
+@app.route('/api/trainer/workout/<int:user_id>', methods=['POST'])
+def api_update_workout(user_id):
+    if session.get('role') != 'trainer':
+        return jsonify({"error": "Access Denied"}), 403
+        
+    data = request.json or request.form
+    workout_details = data.get('workout_details')
+    suggestion = data.get('suggestion')
+    
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO WorkoutPlan (user_id, workout_details, suggestion) 
+            VALUES (%s, %s, %s)
+            ON DUPLICATE KEY UPDATE workout_details = VALUES(workout_details), suggestion = VALUES(suggestion)
+        """
+        cursor.execute(query, (user_id, workout_details, suggestion))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Workout plan updated"})
+    return jsonify({"error": "DB connection failed"}), 500
+
+@app.route('/api/trainer/meal/<int:user_id>', methods=['POST'])
+def api_update_meal(user_id):
+    if session.get('role') != 'trainer':
+        return jsonify({"error": "Access Denied"}), 403
+        
+    data = request.json or request.form
+    meal_details = data.get('meal_details')
+    
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO MealPlan (user_id, meal_details) 
+            VALUES (%s, %s)
+            ON DUPLICATE KEY UPDATE meal_details = VALUES(meal_details)
+        """
+        cursor.execute(query, (user_id, meal_details))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Meal plan updated"})
+    return jsonify({"error": "DB connection failed"}), 500
+
+@app.route('/api/member/plans', methods=['GET'])
+def api_member_plans():
+    if session.get('role') != 'member':
+        return jsonify({"error": "Access Denied"}), 403
+        
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT workout_details, suggestion FROM WorkoutPlan WHERE user_id = %s", (session['user_id'],))
+        workout = cursor.fetchone()
+        
+        cursor.execute("SELECT meal_details FROM MealPlan WHERE user_id = %s", (session['user_id'],))
+        meal = cursor.fetchone()
+        
+        cursor.close()
+        conn.close()
+        return jsonify({
+            "workout": workout,
+            "meal": meal
+        })
+    return jsonify({"error": "DB connection failed"}), 500
+
 @app.route('/dashboard')
 def dashboard():
     if session.get('role') != 'member': return "Access Denied", 403

@@ -1,13 +1,16 @@
 import DashboardLayout from '../components/DashboardLayout';
 import { Dumbbell, Play } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useNavigate } from 'react-router';
 
 export default function Workouts() {
+  const navigate = useNavigate();
+
   const workouts = [
-    { name: 'Upper Body Strength', duration: '45 min', difficulty: 'Advanced', exercises: 8 },
-    { name: 'Cardio Blast', duration: '30 min', difficulty: 'Intermediate', exercises: 6 },
-    { name: 'Core & Abs', duration: '20 min', difficulty: 'Beginner', exercises: 10 },
-    { name: 'Full Body HIIT', duration: '40 min', difficulty: 'Advanced', exercises: 12 },
+    { id: 'upper-body-strength', name: 'Upper Body Strength', duration: '45 min', difficulty: 'Advanced', exercises: 8 },
+    { id: 'cardio-blast', name: 'Cardio Blast', duration: '30 min', difficulty: 'Intermediate', exercises: 6 },
+    { id: 'core-abs', name: 'Core & Abs', duration: '20 min', difficulty: 'Beginner', exercises: 10 },
+    { id: 'full-body-hiit', name: 'Full Body HIIT', duration: '40 min', difficulty: 'Advanced', exercises: 12 },
   ];
 
   return (
@@ -15,7 +18,7 @@ export default function Workouts() {
       <div className="grid md:grid-cols-2 gap-6">
         {workouts.map((workout, index) => (
           <motion.div
-            key={index}
+            key={workout.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
@@ -39,7 +42,10 @@ export default function Workouts() {
                 {workout.difficulty}
               </span>
             </div>
-            <button className="w-full py-3 bg-primary text-white rounded-lg font-medium flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/50 transition-all">
+            <button 
+              onClick={() => navigate(`/workouts/${workout.id}`)}
+              className="w-full py-3 bg-primary text-white rounded-lg font-medium flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/50 transition-all"
+            >
               <Play className="w-4 h-4" />
               Start Workout
             </button>

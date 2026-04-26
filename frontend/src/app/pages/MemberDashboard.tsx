@@ -1,29 +1,32 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import { motion } from 'motion/react';
-import { Calendar, TrendingUp, Award, CreditCard, User, Dumbbell } from 'lucide-react';
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Calendar, TrendingUp, Award, User, Dumbbell, Apple } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 
 export default function MemberDashboard() {
   const { user } = useAuth();
-  const [diet, setDiet] = useState<string>("Loading recommendation...");
+  const [workout, setWorkout] = useState<any>(null);
+  const [meal, setMeal] = useState<any>(null);
 
   useEffect(() => {
-    if (user?.id) fetchDiet();
+    if (user?.id) fetchPlans();
   }, [user?.id]);
 
-  const fetchDiet = async () => {
+  const fetchPlans = async () => {
     try {
-      const res = await api.get(`/diet/${user?.id}`);
-      if (res.data?.diet_recommendation) {
-        setDiet(res.data.diet_recommendation);
+      const res = await api.get(`/api/member/plans`);
+      if (res.data) {
+        setWorkout(res.data.workout);
+        setMeal(res.data.meal);
       }
     } catch (e) {
-      setDiet("Could not load diet recommendation.");
+      console.error("Could not load plans.", e);
     }
   };
+
   const weightData = [
     { month: 'Jan', weight: 85 },
     { month: 'Feb', weight: 83 },
@@ -98,11 +101,72 @@ export default function MemberDashboard() {
           </motion.div>
         </div>
 
+        {/* Assigned Plans */}
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Workout Plan */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="p-6 rounded-xl bg-card border border-border"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <Dumbbell className="w-6 h-6 text-primary" />
+              <h3 className="text-lg font-semibold">Workout Plan</h3>
+            </div>
+            <div className="space-y-3">
+              {workout ? (
+                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                    {workout.workout_details || "No details provided"}
+                  </p>
+                  {workout.suggestion && (
+                    <div className="mt-3 pt-3 border-t border-primary/20">
+                      <p className="text-xs font-medium text-primary mb-1">Trainer's Note</p>
+                      <p className="text-sm text-muted-foreground">{workout.suggestion}</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="p-4 rounded-lg bg-muted/50 border border-border">
+                  <p className="text-sm text-muted-foreground text-center py-4">No workout plan assigned yet.</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Meal Plan */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="p-6 rounded-xl bg-card border border-border"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <Apple className="w-6 h-6 text-primary" />
+              <h3 className="text-lg font-semibold">Meal Plan</h3>
+            </div>
+            <div className="space-y-3">
+              {meal ? (
+                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                    {meal.meal_details || "No details provided"}
+                  </p>
+                </div>
+              ) : (
+                <div className="p-4 rounded-lg bg-muted/50 border border-border">
+                  <p className="text-sm text-muted-foreground text-center py-4">No meal plan assigned yet.</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+
         {/* Progress Chart */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.6 }}
           className="p-6 rounded-xl bg-card border border-border"
         >
           <h3 className="text-lg font-semibold mb-6">Weight Progress</h3>
@@ -135,12 +199,12 @@ export default function MemberDashboard() {
           </ResponsiveContainer>
         </motion.div>
 
-        {/* Badges & Schedule */}
+        {/* Badges & Payments */}
         <div className="grid md:grid-cols-2 gap-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.7 }}
             className="p-6 rounded-xl bg-card border border-border"
           >
             <h3 className="text-lg font-semibold mb-4">Badges</h3>
@@ -156,49 +220,6 @@ export default function MemberDashboard() {
                   <span className="font-medium">{badge.name}</span>
                 </div>
               ))}
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="p-6 rounded-xl bg-card border border-border"
-          >
-            <h3 className="text-lg font-semibold mb-4">Today's Schedule</h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                <Dumbbell className="w-5 h-5 text-primary" />
-                <div>
-                  <p className="font-medium">Upper Body Workout</p>
-                  <p className="text-xs text-muted-foreground">10:00 AM - 11:00 AM</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                <Calendar className="w-5 h-5 text-primary" />
-                <div>
-                  <p className="font-medium">Trainer Session</p>
-                  <p className="text-xs text-muted-foreground">2:00 PM - 3:00 PM</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Diet & Payments */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="p-6 rounded-xl bg-card border border-border"
-          >
-            <h3 className="text-lg font-semibold mb-4">Diet Recommendation</h3>
-            <div className="space-y-3">
-              <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
-                <p className="font-medium text-primary mb-1">Your Customized Plan</p>
-                <p className="text-sm text-muted-foreground leading-relaxed">{diet}</p>
-              </div>
             </div>
           </motion.div>
 

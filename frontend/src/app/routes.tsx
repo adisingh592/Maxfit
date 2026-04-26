@@ -14,6 +14,7 @@ import AdminEmployees from './pages/AdminEmployees';
 import TrainerPanel from './pages/TrainerPanel';
 import Payments from './pages/Payments';
 import Workouts from './pages/Workouts';
+import WorkoutDetails from './pages/WorkoutDetails';
 import Attendance from './pages/Attendance';
 import Progress from './pages/Progress';
 import Schedule from './pages/Schedule';
@@ -84,6 +85,10 @@ export const router = createBrowserRouter([
   {
     path: '/workouts',
     element: <ProtectedRoute allowedRoles={['member']}><Workouts /></ProtectedRoute>,
+  },
+  {
+    path: '/workouts/:workoutId',
+    element: <ProtectedRoute allowedRoles={['member']}><WorkoutDetails /></ProtectedRoute>,
   },
   {
     path: '/attendance',
